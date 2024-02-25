@@ -1,0 +1,99 @@
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: Grafana Alerts
+    receivers:
+      - uid: f004ed77-3c30-4ec7-bfda-d3232dba8aad
+        type: discord
+        settings:
+          url: $GRAFANA_DISCORD_WEBHOOK_URL
+          use_discord_username: false
+        disableResolveMessage: false
+  - orgId: 1
+    name: email receiver
+    receivers:
+      - uid: f4112549-ffa4-442e-8ab9-08f51ad02d4c
+        type: email
+        settings:
+          addresses: <example@email.com>
+        disableResolveMessage: false
+policies:
+  - orgId: 1
+    receiver: Grafana Alerts
+    group_by:
+      - grafana_folder
+      - alertname
+    group_wait: 10s
+    group_interval: 10s
+
+groups:
+  - orgId: 1
+    name: postgres_alerts_group
+    folder: postgres_alerts
+    interval: 10s
+    rules:
+      - uid: bcdbefa5-6de6-472b-bccd-bebee23c9aa2
+        title: Database Connections
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              datasource:
+                type: prometheus
+                uid: PBFA97CFB590B2093
+              disableTextWrap: false
+              editorMode: code
+              expr: pg_stat_database_numbackends{release="", instance="postgres-exporter:9187", datname="neondb"}
+              fullMetaSearch: false
+              includeNullMetadata: true
+              instant: false
+              interval: ""
+              intervalMs: 15000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: true
+              refId: A
+              useBackend: false
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 6
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                name: Expression
+                type: __expr__
+                uid: __expr__
+              expression: ""
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+              type: classic_conditions
+        dashboardUid: "000000039"
+        panelId: 72
+        noDataState: NoData
+        execErrState: Error
+        for: 10s
+        annotations:
+          __dashboardUid__: "000000039"
+          __panelId__: "72"
+          description: NEW CONNECTIONS IN YOUR DATABASE :0
+          summary: NEW CONNECTIONS
+        labels: {}
+        isPaused: false
