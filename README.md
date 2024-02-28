@@ -1,8 +1,11 @@
+## Monitorea tus servicios en la nube con Grafana (Cloud Native El Salvador)
 
-> Add new metric
+- Grafana (alerting, dashboards, datasources)
+- Prometheus
+- PostgreSQL Exporter
 
-### Database connections
+### Run this example
 
 ```bash
-pg_stat_database_numbackends{release="$release", instance="$instance", datname="neondb"}
+docker compose up
 ```
